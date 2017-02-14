@@ -11,20 +11,21 @@ import CoreData
 
 class ViewController: UIViewController {
     
-    @IBOutlet var status: UILabel!
-    @IBOutlet var uuid: UILabel!
-    @IBOutlet var major: UILabel!
-    @IBOutlet var minor: UILabel!
-    @IBOutlet var accuracy: UILabel!
-    @IBOutlet var rssi: UILabel!
-    @IBOutlet var distance: UILabel!
+    @IBOutlet var l_status: UILabel!
+    @IBOutlet var l_rssi: UILabel!
+    @IBOutlet var l_timer: UILabel!
+    var startTimer: Timer = Timer()
+    var countNum: Int = 0
+    var isRaging: Bool = false
     
     var beaconHelper: BeaconHelper = BeaconHelper.sharedInstance
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        beaconHelper.setDidEnterRegionFunc(func_did_enter: didEnterRegion)
-        beaconHelper.setDidExitRegionFunc(func_did_exit: didExitRegion)
+        beaconHelper.setDidEnterRegionFunc(func_did_enter: _didEnterRegion)
+        beaconHelper.setDidExitRegionFunc(func_did_exit: _didExitRegion)
+        beaconHelper.setDidRangeBeaconFunc(func_did_range: _didRangeBeacons)
+        debugPrint("[init] ViewController")
         // Do any additional setup after loading the view, typically from a nib.
     }
 
@@ -33,18 +34,59 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    func didEnterRegion() {
-        status.textColor = UIColor.blue
-        status.text = "entered"
+    func _didEnterRegion() {
+        l_status.textColor = UIColor.blue
+        l_status.text = "entered"
         debugPrint("[Event] ViewController:Entered!")
-        
     }
     
-    func didExitRegion() {
-        status.textColor = UIColor.red
-        status.text = "exited"
+    func updateTimerLabel() {
+        countNum += 1
+        let ms = countNum % 100
+        let s = (countNum - ms) / 100 % 60
+        let m = (countNum - s - ms) / 6000 % 3600
+        l_timer.text = String(format: "%02d:%02d.%02d", m, s, ms)
+    }
+    
+    func _didExitRegion() {
+        resetView()
+        l_status.textColor = UIColor.red
+        l_status.text = "exited"
+        isRaging = false
+        startTimer.invalidate()
+        countNum = 0
         debugPrint("[Event] ViewController:Exit!")
     }
+    
+    func _didRangeBeacons(rssi: Int, accuracy: Double) {
+        if (!isRaging) {
+            startTimer = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(updateTimerLabel), userInfo: nil, repeats: true)
+            isRaging = true
+        }
+        
+        
+        if (accuracy == -1.0) {
+           l_status.text = "exit proccess"
+           view.backgroundColor = UIColor.black
+           l_status.textColor = UIColor.white
+        } else {
+            l_status.text = "ranging"
+            let param: CGFloat = (-1)/CGFloat(rssi^2)*60
+            debugPrint("[Log] \(rssi):\(param)")
+            view.backgroundColor = UIColor(red: CGFloat(param), green: CGFloat(0.3), blue: CGFloat(0.3), alpha: CGFloat(param))
+        }
+        l_rssi.text = "\(rssi)"
+        l_timer.textColor = UIColor.white
+    }
+    
+    func resetView(){
+        view.backgroundColor = UIColor.white
+        l_status.text   = "NaN"
+        l_rssi.text     = "NaN"
+        l_timer.text    = "Not raging..."
+        l_timer.textColor = UIColor.black
+    }
+    
 
     @IBAction func toBeUserA(_ sender: UISegmentedControl) {
         updateUser(index: sender.selectedSegmentIndex)

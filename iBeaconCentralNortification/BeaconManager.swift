@@ -17,6 +17,12 @@ class BeaconManager : NSObject, CLLocationManagerDelegate {
     var delegate: BeaconDelegate!
     var trackLocationManager = CLLocationManager()
     var beaconRegion: CLBeaconRegion!
+    enum nortificationType: Int {
+        case enterRegion = 0
+        case exitRegion = 1
+        case rangeRegion = 2
+    }
+    var networkManager = NetworkManager()
     
     //シングルトン
     static let sharedInstance = BeaconManager()
@@ -126,7 +132,7 @@ class BeaconManager : NSObject, CLLocationManagerDelegate {
         
         debugPrint("[Event] BeaconManager:Entered!")
         delegate.didEnterRegion()
-        sendLocalNotificationWithMessage(message: "Beacon領域に入りました", region: region)
+        sendLocalNotificationWithMessage(message: "Beacon領域に入りました", region: region, event_type: nortificationType.enterRegion)
     }
     
     //領域から出た時
@@ -137,7 +143,7 @@ class BeaconManager : NSObject, CLLocationManagerDelegate {
         
         //debugPrint("Exit!")
         delegate.didExitRegion()
-        sendLocalNotificationWithMessage(message: "Beacon領域から出ました", region: region)
+        sendLocalNotificationWithMessage(message: "Beacon領域から出ました", region: region, event_type: nortificationType.exitRegion)
         
     }
     
@@ -145,23 +151,19 @@ class BeaconManager : NSObject, CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion) {
         if (beacons.count > 0) {
             let beacon = beacons[0];
-            debugPrint("[Log] \(beacon.accuracy)")
-            debugPrint("[Log] \(beacon.proximity)")
+            //debugPrint("[Log] \(beacon.accuracy)")
+            // debugPrint("[Log] \(beacon.proximity)")
+            delegate.didRangeBeacons(beacon.rssi, accuracy: beacon.accuracy)
         }
     }
     
-    func sendLocalNotificationWithMessage(message: String!, region: CLRegion!) {
+    func sendLocalNotificationWithMessage(message: String!, region: CLRegion!, event_type: nortificationType) {
         //let r: CLBeaconRegion = region as! CLBeaconRegion;
         
         let content = UNMutableNotificationContent()
+        var requestId: Int16 = 0
         content.title = message
-        content.subtitle = "Guests"
         content.sound = UNNotificationSound.default()
-        
-        let URL = NSURL(string: "https://0m8b791v7g.execute-api.us-east-1.amazonaws.com/beta")
-        let serverData = NSData(contentsOf: URL as! URL)
-        content.body = NSString(data:serverData as! Data, encoding:String.Encoding.utf8.rawValue) as! String// 新登場！
-        
         
         let appDelegate: AppDelegate = UIApplication.shared.delegate as! AppDelegate
         let viewContext = appDelegate.persistentContainer.viewContext
@@ -171,17 +173,34 @@ class BeaconManager : NSObject, CLLocationManagerDelegate {
             let fetchResults = try viewContext.fetch(query)
             if fetchResults.count > 0 {
                 let record = fetchResults[0] as NSManagedObject
-                switch record.value(forKey: "id") {
-                    case 0 as Int:
-                        content.subtitle = "Guests"
-                    case 1 as Int:
-                        content.subtitle = "LoggedInUser"
-                    default:
-                        break
-                }
+                requestId = record.value(forKey: "id") as! Int16
             }
+            
+            // 冗長だがめんどくさいので静的に...
+            switch requestId {
+                case 0:
+                    content.subtitle = "Guests"
+                case 1:
+                    content.subtitle = "LoggedInUser"
+                default:
+                    break
+            }
+            
+            // イベントによって処理を変える
+            switch(event_type) {
+                case .enterRegion:
+                    let apiResult = networkManager.getFromApi(requestId: requestId) as Data
+                    let json = try? JSONSerialization.jsonObject(with: apiResult) as! [String:AnyObject]
+                    content.body = "クーポン発行: ¥" + (json?["ask"] as? String)! 
+                case .exitRegion:
+                    content.body = "サヨウナラ！また来てね！"
+                case .rangeRegion:
+                    content.body = "現在:"
+            }
+            
+        
         } catch {
-            content.subtitle = "ERROR"
+            content.body = "ERROR"
         }
         
         // 0.1秒後に発火

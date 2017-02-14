@@ -20,6 +20,7 @@
 		026E54901E51855C000F92FD /* UserModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 026E548E1E51855C000F92FD /* UserModel.xcdatamodeld */; };
 		026E54A01E518F43000F92FD /* User+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026E549E1E518F43000F92FD /* User+CoreDataClass.swift */; };
 		026E54A11E518F43000F92FD /* User+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026E549F1E518F43000F92FD /* User+CoreDataProperties.swift */; };
+		026E54A31E52FFE0000F92FD /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026E54A21E52FFDF000F92FD /* NetworkManager.swift */; };
 		02CDA1CA1E4E11A700B69276 /* Consts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02CDA1C91E4E11A700B69276 /* Consts.swift */; };
 		02CDA1CC1E4E251A00B69276 /* BeaconHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02CDA1CB1E4E251A00B69276 /* BeaconHelper.swift */; };
 /* End PBXBuildFile section */
@@ -62,6 +63,7 @@
 		026E548F1E51855C000F92FD /* UserModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = UserModel.xcdatamodel; sourceTree = "<group>"; };
 		026E549E1E518F43000F92FD /* User+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "User+CoreDataClass.swift"; path = "../User+CoreDataClass.swift"; sourceTree = "<group>"; };
 		026E549F1E518F43000F92FD /* User+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "User+CoreDataProperties.swift"; path = "../User+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		026E54A21E52FFDF000F92FD /* NetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		02CDA1C91E4E11A700B69276 /* Consts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Consts.swift; sourceTree = "<group>"; };
 		02CDA1CB1E4E251A00B69276 /* BeaconHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeaconHelper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -169,6 +171,7 @@
 			children = (
 				02194BD21E4E07C200EB83E5 /* BeaconManager.swift */,
 				02CDA1CB1E4E251A00B69276 /* BeaconHelper.swift */,
+				026E54A21E52FFDF000F92FD /* NetworkManager.swift */,
 			);
 			name = Logic;
 			sourceTree = "<group>";
@@ -340,6 +343,7 @@
 				02CDA1CA1E4E11A700B69276 /* Consts.swift in Sources */,
 				02194B9C1E4E049500EB83E5 /* ViewController.swift in Sources */,
 				02194BA21E4E049500EB83E5 /* iBeaconCentralNortification.xcdatamodeld in Sources */,
+				026E54A31E52FFE0000F92FD /* NetworkManager.swift in Sources */,
 				02194BCB1E4E051300EB83E5 /* BeaconDelegate.swift in Sources */,
 				026E54A01E518F43000F92FD /* User+CoreDataClass.swift in Sources */,
 				02CDA1CC1E4E251A00B69276 /* BeaconHelper.swift in Sources */,

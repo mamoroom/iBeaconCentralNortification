@@ -11,16 +11,15 @@ import Foundation
 class BeaconHelper : NSObject, BeaconDelegate {
     
     var beaconManager: BeaconManager = BeaconManager.sharedInstance
-    var ArrayOfDidEnterRegionFuncs: Array<() -> Void>
-    var ArrayOfDidExitRegionFuncs: Array<() -> Void>
+    var ArrayOfDidEnterRegionFuncs: Array<() -> Void> = []
+    var ArrayOfDidExitRegionFuncs: Array<() -> Void> = []
+    var ArrayOfDidRangeBeaconFuncs: Array<(Int, Double) -> Void> = []
     
     //シングルトン
     static let sharedInstance = BeaconHelper()
     
     override init() {
         debugPrint("[init] BeaconHelper")
-        ArrayOfDidEnterRegionFuncs = []
-        ArrayOfDidExitRegionFuncs  = []
         super.init()
         beaconManager.delegate = self
     }
@@ -30,6 +29,9 @@ class BeaconHelper : NSObject, BeaconDelegate {
     }
     func setDidExitRegionFunc(func_did_exit: @escaping ()->Void) {
        self.ArrayOfDidExitRegionFuncs.append(func_did_exit)
+    }
+    func setDidRangeBeaconFunc(func_did_range: @escaping (Int, Double)->Void) {
+       self.ArrayOfDidRangeBeaconFuncs.append(func_did_range)
     }
     
     func didEnterRegion() {
@@ -42,5 +44,12 @@ class BeaconHelper : NSObject, BeaconDelegate {
         for _func in self.ArrayOfDidExitRegionFuncs {
             _func()
         }
+    }
+    
+    func didRangeBeacons(_ rssi: Int, accuracy: Double) {
+        for _func in self.ArrayOfDidRangeBeaconFuncs {
+            _func(rssi, accuracy)
+        }
+        
     }
 }

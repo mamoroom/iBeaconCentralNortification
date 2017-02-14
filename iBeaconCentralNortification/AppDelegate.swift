@@ -10,19 +10,17 @@ import UIKit
 import CoreData
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate, BeaconDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     var beaconHelper = BeaconHelper.sharedInstance
-    //var beaconHelper: BeaconHelper = BeaconHelper.sharedInstance
-    //var beaconHelper = BeaconHelper()
-
+    //var backgroundTaskID : UIBackgroundTaskIdentifier = 0
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
-        beaconHelper.setDidEnterRegionFunc(func_did_enter: didEnterRegion)
-        beaconHelper.setDidExitRegionFunc(func_did_exit: didExitRegion)
+        beaconHelper.setDidEnterRegionFunc(func_did_enter: _didEnterRegion)
+        beaconHelper.setDidExitRegionFunc(func_did_exit: _didExitRegion)
         
         //let context = persistentContainer.viewContext
         //let user = NSEntityDescription.insertNewObject(forEntityName: "User", into: context) as! User
@@ -35,6 +33,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, BeaconDelegate {
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
+        
+        /*
+        self.backgroundTaskID = application.beginBackgroundTask(){
+            [weak self] in
+            application.endBackgroundTask((self?.backgroundTaskID)!)
+            self?.backgroundTaskID = UIBackgroundTaskInvalid
+        }
+        */
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {
@@ -48,6 +54,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, BeaconDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        
+        //application.endBackgroundTask(self.backgroundTaskID)
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
@@ -101,13 +109,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, BeaconDelegate {
         }
     }
     
-    func didEnterRegion() {
+    func _didEnterRegion() {
         debugPrint("[Event] AppDelegate:Entered!")
     }
     
-    func didExitRegion() {
+    func _didExitRegion() {
         debugPrint("[Event] AppDelegate:Exit!")
     }
-
 }
 

@@ -12,5 +12,5 @@ public protocol BeaconDelegate : NSObjectProtocol {
     
     func didEnterRegion()
     func didExitRegion()
-
+    func didRangeBeacons(_ rssi: Int, accuracy: Double)
 }
